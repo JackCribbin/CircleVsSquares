@@ -1,0 +1,46 @@
+# === Unity generated folders ===
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# === Visual Studio / Rider files ===
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+.vs/
+*.riderp
+
+# === Unity Package Manager caches ===
+/Packages/com.unity.package-manager-do-not-track/
+
+# === OS generated files ===
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# === Build output (optional) ===
+/Builds/
+
+# === Unity generated metadata examples ===
+*.pidb.meta
+*.pdb.meta
+
+# Keep .meta files inside Assets/ and ProjectSettings/,
+# but ignore or adjust other manifest/lock files if needed.
+*.meta
+!ProjectSettings/ProjectSettings.asset
+!ProjectSettings/EditorBuildSettings.asset
+
+# === Crash Reports ===
+CrashReport.log
