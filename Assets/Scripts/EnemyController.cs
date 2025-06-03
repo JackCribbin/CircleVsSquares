@@ -1,31 +1,50 @@
 using UnityEngine;
+using UnityEngine.UI;  // ← we need this to reference the UI.Image type
 
 public class EnemyController : MonoBehaviour
 {
     [Header("Enemy Settings")]
-    public float speed = 2f;           // How fast this enemy moves toward the player
+    [Tooltip("Movement speed toward the player.")]
+    public float speed = 2f;
 
-    private Transform playerTransform; // Reference to the player’s Transform
+    [Header("Health Settings")]
+    [Tooltip("Max health of this enemy.")]
+    public int maxHealth = 100;
+
+    // Reference to the fill Image on the health bar
+    [Header("UI")]
+    [Tooltip("Drag the 'HealthBar_Fill' Image here (child of EnemyHealthBar_Canvas).")]
+    public Image healthBarFill;
+
+    private int currentHealth;
+    private Transform playerTransform;
 
     void Start()
     {
-        // Find the player GameObject by tag at startup
+        // Initialize health
+        currentHealth = maxHealth;
+
+        // Find the player by tag
         GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
         if (playerGO != null)
         {
             playerTransform = playerGO.transform;
+        }
+
+        // Initialize the health bar to full
+        if (healthBarFill != null)
+        {
+            healthBarFill.fillAmount = 1f;
         }
     }
 
     void Update()
     {
         if (playerTransform == null)
-            return; // No player found — don’t do anything
+            return;
 
-        // Compute a normalized direction vector toward the player
+        // Move toward the player
         Vector2 direction = (playerTransform.position - transform.position).normalized;
-
-        // Move the enemy a bit this frame
         transform.position += (Vector3)(direction * speed * Time.deltaTime);
     }
 
@@ -33,15 +52,45 @@ public class EnemyController : MonoBehaviour
     {
         if (other.CompareTag("Bullet"))
         {
-            // Destroy the bullet and this enemy
+            // Read the damage from the bullet
+            BulletController bullet = other.GetComponent<BulletController>();
+            if (bullet != null)
+            {
+                TakeDamage(bullet.damage);
+            }
+
+            // Destroy the bullet
             Destroy(other.gameObject);
-            Destroy(gameObject);
         }
         else if (other.CompareTag("Player"))
         {
-            // Enemy reached the player: you could do damage or end the game here.
             Debug.Log("Enemy hit the player!");
             Destroy(gameObject);
         }
+    }
+
+    private void TakeDamage(int amount)
+    {
+        currentHealth -= amount;
+
+        // Clamp to zero so we never go below 0
+        currentHealth = Mathf.Max(currentHealth, 0);
+
+        // Update the health bar fill (if assigned)
+        if (healthBarFill != null)
+        {
+            healthBarFill.fillAmount = (float)currentHealth / maxHealth;
+        }
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        // (Optional) spawn death VFX here, award points, etc.
+        Destroy(gameObject);
     }
 }
