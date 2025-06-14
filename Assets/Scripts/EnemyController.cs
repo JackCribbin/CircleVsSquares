@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;  // ← we need this to reference the UI.Image type
+using UnityEngine.UI;  // ← needed for Image type
 
 public class EnemyController : MonoBehaviour
 {
@@ -11,6 +11,10 @@ public class EnemyController : MonoBehaviour
     [Tooltip("Max health of this enemy.")]
     public int maxHealth = 100;
 
+    [Header("XP Settings")]
+    [Tooltip("How much XP this enemy awards.")]
+    public int xpValue = 10;
+
     // Reference to the fill Image on the health bar
     [Header("UI")]
     [Tooltip("Drag the 'HealthBar_Fill' Image here (child of EnemyHealthBar_Canvas).")]
@@ -18,6 +22,7 @@ public class EnemyController : MonoBehaviour
 
     private int currentHealth;
     private Transform playerTransform;
+    private PlayerController playerController;
 
     void Start()
     {
@@ -29,6 +34,9 @@ public class EnemyController : MonoBehaviour
         if (playerGO != null)
         {
             playerTransform = playerGO.transform;
+            playerController = playerGO.GetComponent<PlayerController>();
+            if (playerController == null)
+                Debug.LogWarning("PlayerController component not found on Player GameObject.");
         }
 
         // Initialize the health bar to full
@@ -65,7 +73,7 @@ public class EnemyController : MonoBehaviour
         else if (other.CompareTag("Player"))
         {
             Debug.Log("Enemy hit the player!");
-            Destroy(gameObject);
+            Die();
         }
     }
 
@@ -90,6 +98,19 @@ public class EnemyController : MonoBehaviour
 
     private void Die()
     {
+        // Award XP to the player
+        if (playerController != null)
+        {
+            playerController.GainXP(xpValue);
+        }
+        else
+        {
+            // Fallback: try finding again at runtime
+            PlayerController pc = FindObjectOfType<PlayerController>();
+            if (pc != null)
+                pc.GainXP(xpValue);
+        }
+
         // (Optional) spawn death VFX here, award points, etc.
         Destroy(gameObject);
     }
